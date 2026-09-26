@@ -43,8 +43,8 @@ fi
 mkdir -p exports
 "$FFMPEG" -loglevel error -y "${args[@]}" -filter_complex "$filter" -map "[v]" -map "[a]" \
   -c:v libx264 -crf 18 -preset medium -pix_fmt yuv420p -c:a aac -b:a 192k exports/${FILM}-full.mp4
-"$FFMPEG" -loglevel error -y -i exports/${FILM}-full.mp4 -vf scale=720:1280 -c:v libx264 -crf 24 -preset medium \
+"$FFMPEG" -loglevel error -y -i exports/${FILM}-full.mp4 -vf scale=720:-2 -c:v libx264 -crf 24 -preset medium \
   -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:a aac -b:a 128k exports/${FILM}-full-phone.mp4
-"$FFMPEG" -loglevel error -y -i exports/${FILM}-full.mp4 -vf scale=540:960 -c:v libx264 -crf 28 -preset medium \
+"$FFMPEG" -loglevel error -y -i exports/${FILM}-full.mp4 -vf scale=540:-2 -c:v libx264 -crf 28 -preset medium \
   -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:a aac -b:a 128k exports/${FILM}-full-light.mp4
 ls -la exports/${FILM}-full*.mp4

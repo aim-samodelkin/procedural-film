@@ -144,7 +144,7 @@ Done when: a single frame shows every character in every pose it needs, and the 
 
 Read `reference/shot-types.md` for the shot types the example film proves, then fill `docs/storyboard.md` from the template: logline; numbers (pick a bpm, then beat = 60/bpm seconds and the duration lands in whole bars); summary table; acts mapped to bars; a shared-geometry table for every shape that survives a **match cut**; then one entry per shot — 1 to 3 seconds each, boundaries on the beat grid, plates alternating — with all eight subsections, the Sound cues timestamped on the grid.
 
-**Reading time.** The 1-to-3-second shot is for pictorial films in a feed. A film whose frames carry text to read — an explainer of a document, numbers on cards — needs each frame to finish its animation and then **hold**: about 10 seconds for a dense card, with the background still moving so the frame stays alive. Build the elements up slowly enough to follow (a card rising over about half a second, numbers counting over one to two seconds). Ask the user when in doubt; they notice at once when they cannot read.
+**Reading time.** The 1-to-3-second shot is for pictorial films in a feed. A film whose frames carry text to read — an explainer of a document, numbers on cards — needs each frame to finish its animation and then **hold** long enough to read the whole frame, with the background still moving so the frame stays alive. Build the elements up slowly enough to follow. Agree the hold time with the user and record it as a locked decision; they notice at once when they cannot read.
 
 **Series:** the first shot of a later part starts from the previous part's seam frame, and the last shot ends on a clean seam frame for the next part (`reference/series.md`).
 
@@ -185,7 +185,7 @@ Done when: every shot's contact sheet has been eyeballed and judged on-brief, an
 
 Compose `src/music.js` per `reference/music.md`: keep the engine, replace the CH chord table, the MIX.ride automation and the whole score() function, implementing every cue in `FILM.TIMELINE.cues` at its exact time so the hits land on the cuts.
 
-When the user has a style in mind (for example synthwave), write the new voices into `src/music.js` first and let them choose by ear: a sampler program, switched on by a flag in a fixtures timeline, plays each voice in two or three variants for two bars on the film's chords; render it, cut one normalised clip per voice and give the user one page with the players and numbered descriptions. Record the chosen voices in `FILM.md` as locked. A score that walks `FILM.TIMELINE.shots` and arranges each section by shot id re-times itself when shot lengths change.
+When the user has a musical style in mind, write the new voices into `src/music.js` first and let them choose by ear: a sampler program, switched on by a flag in a fixtures timeline, plays each voice in two or three variants for two bars on the film's chords; render it, cut one normalised clip per voice and give the user one page with the players and numbered descriptions. Record the chosen voices in `FILM.md` as locked. A score that walks `FILM.TIMELINE.shots` and arranges each section by shot id re-times itself when shot lengths change.
 
 Done when: `node tools/audio/render-audio.cjs` then `node tools/audio/analyze.cjs .tmp/audio/score.wav --cues` matches onsets to cues within 10 ms, `node tools/audio/peaks.cjs .tmp/audio/score.wav` shows headroom under the limiter ceiling, and the gate is green.
 
@@ -227,7 +227,7 @@ ffmpeg -i exports/<slug>.mp4 -c:v libx264 -crf 23 -preset medium -af loudnorm=I=
 
 Write `exports/<slug>-shots.md` last: one line per shot saying what it shows, so whoever shares the film can caption it.
 
-Save the last frame as `docs/last-frame.jpg` and bring `FILM.md` up to date: the state, the seam, the next steps. Messaging channels often cap uploads (around 30 MB); send a light transcode (540 wide, crf 28) when the phone transcode is larger.
+Save the last frame as `docs/last-frame.jpg` and bring `FILM.md` up to date: the state, the seam, the next steps. If the channel the user receives files through caps their size, send a light transcode (540 wide, crf 28) when the phone transcode is larger.
 
 Done when: master, phone transcode, the HTML file and `exports/<slug>-shots.md` exist, `FILM.md` describes the delivered state, the gate is green, and the final watch-through found nothing to fix.
 

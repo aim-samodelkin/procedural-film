@@ -34,16 +34,16 @@ The first part fixes, and the series `FILM.md` records as locked:
 - bpm, key, chord loop and the instrument voices;
 - plates, palette, recurring layout (headers, progress devices, cards);
 - reading rhythm — how long a finished frame holds;
-- the **length unit**: every part's duration is a whole multiple of the background's loop period (for a scrolling floor that repeats every beat and props every 8 beats, a multiple of 8 beats). Then the background is in the same phase at every seam.
+- the **length unit**: every part's duration is a whole multiple of the background's loop period (if the background repeats every 8 beats, a multiple of 8 beats). Then the background is in the same phase at every seam.
 
 Later parts copy part 1's folder without its scenes and exports, keep `src/lib.js` and `src/music.js`, and port any shared fix back to every part that uses the file.
 
 ## The seam: last frame of part N = first frame of part N+1
 
-Design the end of every part as a **clean seam frame**: no must-read text, only the continuous background and the recurring devices (a header, a progress dot that hands off). A seam frame that still shows the part's text forces the next part to redraw that text.
+Design the end of every part as a **clean seam frame**: no must-read text, only the continuous background and the recurring devices (a header, a progress marker that hands off). A seam frame that still shows the part's text forces the next part to redraw that text.
 
-1. **Series clock.** Everything that moves by global time — backgrounds, props, stars, noise — reads `T + FILM.TIMELINE.clock`, where `clock` is the total length of the earlier parts. Part N+1's frame 0 then continues part N's last frame by exactly one frame. Beat-locked pulses need no offset when every part is a whole number of beats.
-2. **Reproducible end state.** Express the last frame as helper calls with fixed arguments (for example `swBack(ctx, T, { dim: 0.25 })` plus a header state) and write that code into the part's `PART.md`; write the general rule (which dot glows at the end of part N) into the series `FILM.md`. Part N+1's first shot starts from exactly that call.
+1. **Series clock.** Everything that moves by global time — backgrounds, drifting elements, noise — reads `T + FILM.TIMELINE.clock`, where `clock` is the total length of the earlier parts. Part N+1's frame 0 then continues part N's last frame by exactly one frame. Beat-locked pulses need no offset when every part is a whole number of beats.
+2. **Reproducible end state.** Express the last frame as helper calls with fixed arguments (the background helper with its options, plus the state of every recurring device) and write that code into the part's `PART.md`; write the general rule (what the recurring devices show at the end of part N) into the series `FILM.md`. Part N+1's first shot starts from exactly that call.
 3. **Still for comparison.** Save the last frame to `docs/last-frame.jpg`. The seam check snaps part N at its last frame and part N+1 at `T 0` and compares them: everything matches except one frame of motion.
 4. **Audio.** End part N on a sustained chord with the drums silent and name its notes in `PART.md`. Part N+1 opens on the same chord and notes for at least a bar, then brings in its groove. Join with a short audio crossfade (20 ms) so the output fades of the two renders do not click (`templates/join.sh` does this for every seam of the film):
 
@@ -51,7 +51,7 @@ Design the end of every part as a **clean seam frame**: no must-read text, only 
    ffmpeg -i part1.mp4 -i part2.mp4 -filter_complex "[0:v][1:v]concat=n=2:v=1:a=0[v];[0:a][1:a]acrossfade=d=0.02[a]" -map "[v]" -map "[a]" film.mp4
    ```
 
-5. **Hand-off device.** Let one element of the seam frame point at what comes next — the next item's dot glowing, a shape that the next part opens from. Part N+1's first shot grows out of it, so the join reads as one move.
+5. **Hand-off device.** Let one element of the seam frame point at what comes next — the next item's marker lighting up, a shape that the next part opens from. Part N+1's first shot grows out of it, so the join reads as one move.
 
 ## When the seam cannot match
 

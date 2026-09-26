@@ -36,7 +36,7 @@ Updated: <date>. Done: <which parts>.
 
 ## Seams
 
-*The rule every seam follows, as code with the part number as a parameter: the background call with the series clock, the recurring devices' state on the last frame (which progress dot glows at the end of part N), and the sustained chord (notes) that ends one part and opens the next. How to check a seam: snap the last frame of part N and frame 0 of part N+1; they differ no more than two neighbouring frames of the same part. The exact code of each seam lives in the parts' `PART.md`.*
+*The rule every seam follows, as code with the part number as a parameter: the background call with the series clock, the recurring devices' state on the last frame (what they show at the end of part N), and the sustained chord (notes) that ends one part and opens the next. How to check a seam: snap the last frame of part N and frame 0 of part N+1; they differ no more than two neighbouring frames of the same part. The exact code of each seam lives in the parts' `PART.md`.*
 
 ## Joining the film
 
