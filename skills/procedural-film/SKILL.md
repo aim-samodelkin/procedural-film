@@ -29,7 +29,7 @@ A retro film works the same way. Its timeline declares `width: 1920, height: 108
 This skill packages a proven pipeline. It ships these folders:
 
 - `foundation/` — the engine and tools, copied into the new project: `src/core.js`, `src/lib.js`, `src/player.js`, `src/music.js` (engine plus a demo score), `src/props.js` (photo-doodle: the shared doodle props), and `tools/` (build, check, snap, render, stubgen, audio analysis, fixtures, and `photos.cjs` + `cutout.py` for photo-doodle). Everything is driven by `src/timeline.js`, so no tool code changes per film.
-- `templates/` — the four planning documents every film starts from, the film passport `FILM.md`, plus, for photo-doodle, `art-bible-photo-doodle.md` (that mode's house style, ready to fill) and `cast.js` (a worked character module to rewrite).
+- `templates/` — the four planning documents every film starts from, the film passport `FILM.md`, the series document `series-FILM.md` and `join.sh` for a film made of parts, plus, for photo-doodle, `art-bible-photo-doodle.md` (that mode's house style, ready to fill) and `cast.js` (a worked character module to rewrite).
 - `retro/`: the retro kit, copied over `foundation/` for a retro film. It holds `src/pixel.js` (the pixel kit on `FILM.retro`), `src/chip.js` (the NES sound chip), `src/crt.js` (the old TV), the retro fixtures and `tools/audio/melody.cjs`.
 - `game/`: the starter game, copied over `retro/` for a retro game. It is a one-level platformer called ROBOT RUN with its console, levels, sprites, proofs and release tools.
 - `reference/` — read when a step below points at one; the three example images first. `reference/series.md` covers films made of several parts.
@@ -43,6 +43,8 @@ Look first: `reference/example-contact-sheet.jpg` (the whole example film, 24 la
 ## The film passport (FILM.md)
 
 Every film keeps `FILM.md` in its project root, copied from `templates/FILM.md` at setup. It is the handoff document: a fresh session, a resumed one or the agent making the next part of a series reads it first and opens only the files it points to, instead of loading the whole project into context. It holds the locked decisions (everything the user chose or approved), a file map with what to read and what to skip, the helpers added to `src/lib.js` and `src/music.js` with approximate line numbers, the exact commands, the shot table, the seam (the last frame and the end of the audio, as reproducible code), the next steps and a short decision log.
+
+A film made of parts keeps two documents instead: one `FILM.md` for the whole film at the root of the film folder (`templates/series-FILM.md`) and a `PART.md` passport in each numbered part folder (`templates/FILM.md`). `reference/series.md` shows the layout.
 
 Update it at the end of every step below and before any session ends — a step is not done while the passport describes an older state. Rewrite stale lines instead of appending, mark stale documents as stale, and keep it specific: numbers, names, paths.
 
@@ -64,7 +66,7 @@ Done when: the subject is one written sentence the user has seen.
 
 ### 1. Setup
 
-Create the project folder named for the film's slug and copy `foundation/` into it. Run `npm install` in `tools/` (Playwright; add `npx playwright install chromium` there if the browser is missing) and confirm ffmpeg is on the PATH, or set `FFMPEG` to its binary. Copy the templates into `docs/` (the passport `templates/FILM.md` into the project root instead) and set the subject in `docs/CONTRACT.md`'s Goal. For a later part of a series, copy the previous part's project without its scenes, exports and renders instead of `foundation/`, and set `clock` in the timeline (see `reference/series.md`).
+Create the project folder named for the film's slug and copy `foundation/` into it. Run `npm install` in `tools/` (Playwright; add `npx playwright install chromium` there if the browser is missing) and confirm ffmpeg is on the PATH, or set `FFMPEG` to its binary. Copy the templates into `docs/` (the passport `templates/FILM.md` into the project root instead) and set the subject in `docs/CONTRACT.md`'s Goal. For a series, the project is a numbered part folder `NN-<slug>/` inside the film folder, with `PART.md` as its passport and the series `FILM.md` and `join.sh` at the film folder's root (from `templates/series-FILM.md` and `templates/join.sh`). For a later part, copy the previous part's project without its scenes, exports and renders instead of `foundation/`, and set `clock` in the timeline (see `reference/series.md`).
 
 **photo-doodle:** also copy `templates/cast.js` to `src/cast.js` (you rewrite its bodies in step 3b), create `assets/raw/` and `assets/cut/`, and install the cut-out tool once:
 

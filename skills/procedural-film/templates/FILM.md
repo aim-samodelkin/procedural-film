@@ -10,15 +10,13 @@ Updated: <date>, after <step or part>.
 
 *One paragraph: the subject, the source material (a document, a brief), the audience and where the film will be shown (phone feed or a screen), the mode.*
 
-*If the film is one part of a series, the series table:*
-
-| Part | What | Folder | Length | Status |
-|---|---|---|---|---|
-| 1 | *…* | *path* | *s* | *done / in progress / not started* |
+*If the film is one part of a series, this file is the part's `PART.md`: say which part it is, point to `../FILM.md` (the series document with the parts table and the series decisions) and do not repeat what is there.*
 
 ## Locked decisions
 
 *Everything the user chose or approved that the next agent must not change without asking: frame and safe area, bpm and key, the chosen instrument voices, palette and plates, recurring layout (header, cards, captions), the reading rhythm (how long a finished frame holds), text rules, the length unit of a part. One line each, with the reason when it is not obvious.*
+
+*In a part of a series, list only this part's own decisions here; the series decisions live in `../FILM.md`.*
 
 ## File map
 
