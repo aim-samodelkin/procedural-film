@@ -29,16 +29,22 @@ A retro film works the same way. Its timeline declares `width: 1920, height: 108
 This skill packages a proven pipeline. It ships these folders:
 
 - `foundation/` — the engine and tools, copied into the new project: `src/core.js`, `src/lib.js`, `src/player.js`, `src/music.js` (engine plus a demo score), `src/props.js` (photo-doodle: the shared doodle props), and `tools/` (build, check, snap, render, stubgen, audio analysis, fixtures, and `photos.cjs` + `cutout.py` for photo-doodle). Everything is driven by `src/timeline.js`, so no tool code changes per film.
-- `templates/` — the four planning documents every film starts from, plus, for photo-doodle, `art-bible-photo-doodle.md` (that mode's house style, ready to fill) and `cast.js` (a worked character module to rewrite).
+- `templates/` — the four planning documents every film starts from, the film passport `FILM.md`, plus, for photo-doodle, `art-bible-photo-doodle.md` (that mode's house style, ready to fill) and `cast.js` (a worked character module to rewrite).
 - `retro/`: the retro kit, copied over `foundation/` for a retro film. It holds `src/pixel.js` (the pixel kit on `FILM.retro`), `src/chip.js` (the NES sound chip), `src/crt.js` (the old TV), the retro fixtures and `tools/audio/melody.cjs`.
 - `game/`: the starter game, copied over `retro/` for a retro game. It is a one-level platformer called ROBOT RUN with its console, levels, sprites, proofs and release tools.
-- `reference/` — read when a step below points at one; the three example images first.
+- `reference/` — read when a step below points at one; the three example images first. `reference/series.md` covers films made of several parts.
 
 Look first: `reference/example-contact-sheet.jpg` (the whole example film, 24 labelled frames), `reference/example-paper-frame.jpg` and `reference/example-blueprint-frame.jpg` (one full frame of each plate). That density and that finish are the bar.
 
 ## The gate
 
 `node tools/check.cjs` is the gate: six checks (media scan, determinism, source scan, timeline, draw, frame cost), and exit 0 means green. From the stub pass onward, no step is done while the gate is red. On real scenes it takes under a minute — let it finish.
+
+## The film passport (FILM.md)
+
+Every film keeps `FILM.md` in its project root, copied from `templates/FILM.md` at setup. It is the handoff document: a fresh session, a resumed one or the agent making the next part of a series reads it first and opens only the files it points to, instead of loading the whole project into context. It holds the locked decisions (everything the user chose or approved), a file map with what to read and what to skip, the helpers added to `src/lib.js` and `src/music.js` with approximate line numbers, the exact commands, the shot table, the seam (the last frame and the end of the audio, as reproducible code), the next steps and a short decision log.
+
+Update it at the end of every step below and before any session ends — a step is not done while the passport describes an older state. Rewrite stale lines instead of appending, mark stale documents as stale, and keep it specific: numbers, names, paths.
 
 ## Worked example
 
@@ -48,7 +54,9 @@ Look first: `reference/example-contact-sheet.jpg` (the whole example film, 24 la
 
 ### 0. Brief
 
-Ask one round of questions: the subject, what the film must include about it, and the length if it differs from 30 seconds. Invent the rest and say what you invented.
+Ask one round of questions: the subject, what the film must include about it, and the length if it differs from 30 seconds. Also ask where it will be shown — a phone feed (keep the Shorts safe area) or a screen and a meeting (centre the content and use the whole frame; set `safeBottom` in the timeline to match) — and whether it is one part of a longer film. For a series, read `reference/series.md` now: part 1 fixes the tempo, key, voices, look and length unit for every part. Invent the rest and say what you invented.
+
+Many users want to agree each step before the next one starts — the storyboard, the sounds, one style frame — rather than receive a finished film. Offer that rhythm when the film is for their own audience.
 
 Done when: the subject is one written sentence the user has seen.
 
@@ -56,7 +64,7 @@ Done when: the subject is one written sentence the user has seen.
 
 ### 1. Setup
 
-Create the project folder named for the film's slug and copy `foundation/` into it. Run `npm install` in `tools/` (Playwright; add `npx playwright install chromium` there if the browser is missing) and confirm ffmpeg is on the PATH, or set `FFMPEG` to its binary. Copy the templates into `docs/` and set the subject in `docs/CONTRACT.md`'s Goal.
+Create the project folder named for the film's slug and copy `foundation/` into it. Run `npm install` in `tools/` (Playwright; add `npx playwright install chromium` there if the browser is missing) and confirm ffmpeg is on the PATH, or set `FFMPEG` to its binary. Copy the templates into `docs/` (the passport `templates/FILM.md` into the project root instead) and set the subject in `docs/CONTRACT.md`'s Goal. For a later part of a series, copy the previous part's project without its scenes, exports and renders instead of `foundation/`, and set `clock` in the timeline (see `reference/series.md`).
 
 **photo-doodle:** also copy `templates/cast.js` to `src/cast.js` (you rewrite its bodies in step 3b), create `assets/raw/` and `assets/cut/`, and install the cut-out tool once:
 
@@ -134,6 +142,10 @@ Done when: a single frame shows every character in every pose it needs, and the 
 
 Read `reference/shot-types.md` for the shot types the example film proves, then fill `docs/storyboard.md` from the template: logline; numbers (pick a bpm, then beat = 60/bpm seconds and the duration lands in whole bars); summary table; acts mapped to bars; a shared-geometry table for every shape that survives a **match cut**; then one entry per shot — 1 to 3 seconds each, boundaries on the beat grid, plates alternating — with all eight subsections, the Sound cues timestamped on the grid.
 
+**Reading time.** The 1-to-3-second shot is for pictorial films in a feed. A film whose frames carry text to read — an explainer of a document, numbers on cards — needs each frame to finish its animation and then **hold**: about 10 seconds for a dense card, with the background still moving so the frame stays alive. Build the elements up slowly enough to follow (a card rising over about half a second, numbers counting over one to two seconds). Ask the user when in doubt; they notice at once when they cannot read.
+
+**Series:** the first shot of a later part starts from the previous part's seam frame, and the last shot ends on a clean seam frame for the next part (`reference/series.md`).
+
 **photo-doodle:** the summary table also names, per shot, the photo id, the paper tint and **what the object becomes** — that last column is the film. "The teapot, with steam" is not an idea; "the teapot is the rest stop, and its steam becomes a face that looks at him" is. Add a per-shot position for the hero too, so the character advances across the film instead of standing in the same place in every frame.
 
 **retro:** the shared geometry is the four tables G1 to G4 in the storyboard template, counted in frames at 60 fps and in native pixels: HUD state per shot, hero world-x at each shot start, fixed landmarks, and jump specs. Pick the bpm from the chip speed, bpm = 900/speed (speed 8 is 112.5), so every row lands on a frame. The duration is a whole number of bars. A bar is 16 rows times the chip speed in frames: speed 6 is 1.6 s, speed 8 is 2.133 s, speed 9 is 2.4 s and speed 10 is 2.667 s. Pick the speed whose bars fill the length exactly, so a 12 s film is 5 bars at speed 9. Write "None" under each shot's Overlays subsection, because retro has none. The safe area is 8 native pixels on every side (x 48 to 1872, y 48 to 1032 at output size).
@@ -170,6 +182,8 @@ Done when: every shot's contact sheet has been eyeballed and judged on-brief, an
 ### 8. Music
 
 Compose `src/music.js` per `reference/music.md`: keep the engine, replace the CH chord table, the MIX.ride automation and the whole score() function, implementing every cue in `FILM.TIMELINE.cues` at its exact time so the hits land on the cuts.
+
+When the user has a style in mind (for example synthwave), write the new voices into `src/music.js` first and let them choose by ear: a sampler program, switched on by a flag in a fixtures timeline, plays each voice in two or three variants for two bars on the film's chords; render it, cut one normalised clip per voice and give the user one page with the players and numbered descriptions. Record the chosen voices in `FILM.md` as locked. A score that walks `FILM.TIMELINE.shots` and arranges each section by shot id re-times itself when shot lengths change.
 
 Done when: `node tools/audio/render-audio.cjs` then `node tools/audio/analyze.cjs .tmp/audio/score.wav --cues` matches onsets to cues within 10 ms, `node tools/audio/peaks.cjs .tmp/audio/score.wav` shows headroom under the limiter ceiling, and the gate is green.
 
@@ -211,7 +225,9 @@ ffmpeg -i exports/<slug>.mp4 -c:v libx264 -crf 23 -preset medium -af loudnorm=I=
 
 Write `exports/<slug>-shots.md` last: one line per shot saying what it shows, so whoever shares the film can caption it.
 
-Done when: master, phone transcode, the HTML file and `exports/<slug>-shots.md` exist, the gate is green, and the final watch-through found nothing to fix.
+Save the last frame as `docs/last-frame.jpg` and bring `FILM.md` up to date: the state, the seam, the next steps. Messaging channels often cap uploads (around 30 MB); send a light transcode (540 wide, crf 28) when the phone transcode is larger.
+
+Done when: master, phone transcode, the HTML file and `exports/<slug>-shots.md` exist, `FILM.md` describes the delivered state, the gate is green, and the final watch-through found nothing to fix.
 
 ## Retro game
 
