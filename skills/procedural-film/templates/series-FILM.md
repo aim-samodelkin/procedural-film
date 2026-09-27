@@ -16,6 +16,7 @@ Updated: <date>. Done: <which parts>.
 <film-slug>/
   FILM.md                this document
   join.sh                joins the finished parts into one video
+  check-join.py          checks that the joined sound stays in sync with the picture
   exports/               the joined film (not in git)
   01-<slug>/             part 1: PART.md, src/, docs/, tools/, exports/
   02-<slug>/             part 2
@@ -41,10 +42,11 @@ Updated: <date>. Done: <which parts>.
 ## Joining the film
 
 ```bash
-./join.sh          # every finished part in folder order → exports/<film>-full.mp4, -phone.mp4, -light.mp4
+FILM=<film> ./join.sh              # every finished part in folder order → exports/<film>-full.mp4, -phone.mp4, -light.mp4
+FILM=<film> python3 check-join.py  # audio offset of every part in the joined film: 0 ms (±2 ms)
 ```
 
-*The script stops at the first part without a master. Video joins cut to cut, audio with a 20 ms crossfade on every seam. Say which transcode goes to the user and any upload limit.*
+*The script stops at the first part without a master. Video joins cut to cut. Each part's audio is trimmed or padded to the exact length of its video, fades out and in over 10 ms at each seam and joins with no overlap, so the sound stays in sync with the picture. Say which transcode goes to the user and any upload limit.*
 
 ## A new part
 
@@ -52,7 +54,7 @@ Updated: <date>. Done: <which parts>.
 2. Set `clock` in its `src/timeline.js` from the parts table; start its `PART.md` from the previous part's.
 3. Agree the brief and the storyboard with the user. The first shot starts from the previous seam; the last shot ends on the next seam.
 4. Stubs, music, scenes, the gate, the master render under the agreed name.
-5. Check both seams on snaps, run `join.sh`, update the parts table here.
+5. Check both seams on snaps, run `join.sh` and `check-join.py`, update the parts table here.
 
 ## Shared code
 

@@ -14,6 +14,7 @@ Keep every part inside one film folder, with one document for the whole film at 
 <film-slug>/
   FILM.md               the series document (templates/series-FILM.md)
   join.sh               joins the finished parts into one video (templates/join.sh)
+  check-join.py         checks that the joined sound stays in sync with the picture (templates/check-join.py)
   exports/              the joined film
   01-<part-slug>/       part 1: a full project (src/, tools/, docs/, exports/) with its PART.md
   02-<part-slug>/       part 2
@@ -45,11 +46,18 @@ Design the end of every part as a **clean seam frame**: no must-read text, only 
 1. **Series clock.** Everything that moves by global time — backgrounds, drifting elements, noise — reads `T + FILM.TIMELINE.clock`, where `clock` is the total length of the earlier parts. Part N+1's frame 0 then continues part N's last frame by exactly one frame. Beat-locked pulses need no offset when every part is a whole number of beats.
 2. **Reproducible end state.** Express the last frame as helper calls with fixed arguments (the background helper with its options, plus the state of every recurring device) and write that code into the part's `PART.md`; write the general rule (what the recurring devices show at the end of part N) into the series `FILM.md`. Part N+1's first shot starts from exactly that call.
 3. **Still for comparison.** Save the last frame to `docs/last-frame.jpg`. The seam check snaps part N at its last frame and part N+1 at `T 0` and compares them: everything matches except one frame of motion.
-4. **Audio.** End part N on a sustained chord with the drums silent and name its notes in `PART.md`. Part N+1 opens on the same chord and notes for at least a bar, then brings in its groove. Join with a short audio crossfade (20 ms) so the output fades of the two renders do not click (`templates/join.sh` does this for every seam of the film):
+4. **Audio.** End part N on a sustained chord with the drums silent and name its notes in `PART.md`. Part N+1 opens on the same chord and notes for at least a bar, then brings in its groove. Join so that every part's sound starts exactly where its picture starts:
+   - Trim or pad each part's audio to the exact length of its video. A render's audio track is rarely the same length as its video (the encoder rounds to its frame size, the music tail runs over), and every millisecond of difference shifts all the parts after it.
+   - Fade out the end of part N and fade in the start of part N+1 over 10 ms each, so the two renders do not click at the seam.
+   - Concatenate the audio with no overlap. Do not use a crossfade (`acrossfade`): it overlaps the two sides and eats its length, so every later part's sound starts that much early, and the drift adds up over the film.
+
+   `templates/join.sh` does this for every seam of the film. For two parts by hand, put the video durations from `ffprobe` in place of `D1` and `D2`, and `D1` − 0.01 in place of `S1`:
 
    ```bash
-   ffmpeg -i part1.mp4 -i part2.mp4 -filter_complex "[0:v][1:v]concat=n=2:v=1:a=0[v];[0:a][1:a]acrossfade=d=0.02[a]" -map "[v]" -map "[a]" film.mp4
+   ffmpeg -i part1.mp4 -i part2.mp4 -filter_complex "[0:a]atrim=0:D1,asetpts=PTS-STARTPTS,apad=whole_dur=D1,afade=t=out:st=S1:d=0.01[a0];[1:a]atrim=0:D2,asetpts=PTS-STARTPTS,apad=whole_dur=D2,afade=t=in:d=0.01[a1];[0:v][1:v]concat=n=2:v=1:a=0[v];[a0][a1]concat=n=2:v=0:a=1[a]" -map "[v]" -map "[a]" film.mp4
    ```
+
+   Then run `templates/check-join.py` from the film folder: for every part it finds 1 s from the middle of the part's master in the joined file by cross-correlation and prints the offset. Every part must be at 0 ms (±2 ms); an offset that grows from part to part means the audio was joined with an overlap or without trimming to the video length.
 
 5. **Hand-off device.** Let one element of the seam frame point at what comes next — the next item's marker lighting up, a shape that the next part opens from. Part N+1's first shot grows out of it, so the join reads as one move.
 
@@ -69,5 +77,5 @@ Sometimes the next part needs a different plate, layout or tempo, or part N is a
 - [ ] Agree the brief and the storyboard with the user; the first shot starts from the seam.
 - [ ] Keep the locked decisions; ask before changing any.
 - [ ] Design the part's end as the next seam frame and write it into its `PART.md`.
-- [ ] Snap and compare both sides of the seam (they should differ no more than two neighbouring frames that change grain); run `join.sh`.
+- [ ] Snap and compare both sides of the seam (they should differ no more than two neighbouring frames that change grain); run `join.sh`, then `check-join.py`: every part's audio offset is 0 ms (±2 ms).
 - [ ] Update the parts table in the series `FILM.md`: status, length, and the next part's `clock`.
